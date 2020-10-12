@@ -1,5 +1,6 @@
 package com.example.quizapplication
 
+import android.content.Intent
 import android.graphics.Color
 import android.graphics.Typeface
 import androidx.appcompat.app.AppCompatActivity
@@ -20,10 +21,14 @@ class QuizQuestionActivity : AppCompatActivity(), View.OnClickListener {
     private var mSelectedOptionPosition : Int = 0
 //    private var selectedInt = 0
     private var TAG: String = "TAG"
+    private var mCorrectAnswer: Int = 0
+    private var mUserName: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_quiz_question)
+
+        mUserName = intent.getStringExtra(Constants.USER_NAME)
 
         mQuestionsList = Constants.getQuestions()
         setQuestion()
@@ -98,13 +103,20 @@ class QuizQuestionActivity : AppCompatActivity(), View.OnClickListener {
                         mCurrentPosition <= mQuestionsList!!.size -> {
                             setQuestion()
                         } else -> {
-                            Toast.makeText(this, "You FINISHED", Toast.LENGTH_SHORT).show()
+                            val intent = Intent(this, ResultActivity:: class.java)
+                            intent.putExtra(Constants.USER_NAME, mUserName)
+                            intent.putExtra(Constants.TOTAL_QUESTIONS, mQuestionsList!!.size)
+                            intent.putExtra(Constants.CORRECT_ANSWERS, mCorrectAnswer)
+                            startActivity(intent)
+                            finish()
                         }
                     }
                 } else {
                     val question = mQuestionsList?.get(mCurrentPosition-1)
                     if(question!!.correctAnswer != mSelectedOptionPosition){
                         answerView(mSelectedOptionPosition, R.drawable.wrong_option_border_bg)
+                    } else {
+                        mCorrectAnswer++
                     }
                     answerView(question!!.correctAnswer, R.drawable.correct_option_border_bg)
 
